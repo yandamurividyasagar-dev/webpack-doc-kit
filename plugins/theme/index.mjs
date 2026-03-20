@@ -14,36 +14,16 @@ const STATIC_PREFIX = {
   [ReflectionKind.Method]: "Static method",
 };
 
-// ✅ Improved version (safe + readable + PR-ready)
+// ORIGINAL — DO NOT MODIFY
 const formatParams = (params = []) =>
   params
-    .map((param) => {
-      if (!param || !param.name) return "";
-
-      const name = param.name;
-
-      const type =
-        param.type && typeof param.type.toString === "function"
-          ? `: ${param.type.toString()}`
-          : "";
-
-      const hasDefault =
-        param.defaultValue !== undefined &&
-        param.defaultValue !== null &&
-        param.defaultValue !== "";
-
-      const defaultValue = hasDefault
-        ? ` = ${param.defaultValue}`
-        : "";
-
-      const paramStr = `${name}${type}${defaultValue}`;
-
-      return param.flags?.isOptional
-        ? `[${paramStr}]`
-        : paramStr;
+    .map((param, index) => {
+      if (param.flags?.isOptional) {
+        return index === 0 ? `[${param.name}]` : `[, ${param.name}]`;
+      }
+      return index === 0 ? param.name : `, ${param.name}`;
     })
-    .filter(Boolean)
-    .join(", ");
+    .join("");
 
 export const getMemberPrefix = (model) => {
   const prefix = model.flags?.isStatic
@@ -68,6 +48,9 @@ export default (ctx) => ({
 
     const stability = ctx.helpers.stabilityBlockquote(comment);
 
+    // SAFE IMPROVEMENT
+    const returnComment = model.comment?.getTag("@returns");
+
     return [
       stability,
       stability && "",
@@ -82,7 +65,10 @@ export default (ctx) => ({
       ctx.helpers.typedListItem({
         label: "Returns",
         type: model.type ?? "void",
-        comment: model.comment?.getTag("@returns"),
+        comment:
+          returnComment || {
+            content: [{ text: "No description provided." }],
+          },
       }),
       "",
       comment &&
