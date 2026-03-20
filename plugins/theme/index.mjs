@@ -14,7 +14,7 @@ const STATIC_PREFIX = {
   [ReflectionKind.Method]: "Static method",
 };
 
-// ORIGINAL — DO NOT MODIFY
+// ORIGINAL  DO NOT MODIFY
 const formatParams = (params = []) =>
   params
     .map((param, index) => {
@@ -48,7 +48,7 @@ export default (ctx) => ({
 
     const stability = ctx.helpers.stabilityBlockquote(comment);
 
-    // SAFE IMPROVEMENT
+    //SAFE IMPROVEMENT
     const returnComment = model.comment?.getTag("@returns");
 
     return [
